@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "momnet": "2.29.1",
+    "yoo-styles": "6.0.326"
+  },
+  "description": "SCS Examples to be cautious of... and protected by Checkmarx for...",
+  "devDependencies": {
+    "async": "^2.0.0-rc.4",
+    "grunt": "^1.0.1"
+  },
+  "main": "server.js",
+  "name": "SupplyChainSecurity",
+  "private": false,
+  "scripts": {},
+  "version": "1.0.0"
+}
