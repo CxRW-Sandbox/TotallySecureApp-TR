@@ -2,10 +2,7 @@ package org.t246osslab.easybuggy4sb.vulnerabilities;
 
 import java.util.Locale;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,23 +27,17 @@ public class CodeInjectionController extends AbstractController {
 	}
 
     private void parseJson(String jsonString, ModelAndView mav, Locale locale) {
-        /* Remove spaces and line breaks to parse as JSON */
-        String convertedJsonString = jsonString.replaceAll(" ", "");
-        convertedJsonString = convertedJsonString.replaceAll("\r\n", "");
-        convertedJsonString = convertedJsonString.replaceAll("\n", "");
         try {
-            /* Parse the input string as JSON */
-        	ScriptEngineManager manager = new ScriptEngineManager();
-        	ScriptEngine scriptEngine = manager.getEngineByName("JavaScript");
-        	scriptEngine.eval("JSON.parse('" + convertedJsonString + "')");
-        	mav.addObject("msg", msg.getMessage("msg.valid.json", null, locale));
-        } catch (ScriptException e) {
-        	mav.addObject("errmsg", msg.getMessage("msg.invalid.json",
-        			new String[] { e.getMessage() }, null, locale));
+            /* Parse the input string as JSON using Jackson's ObjectMapper.
+             * This is a safe alternative to ScriptEngine.eval(), which allowed
+             * arbitrary JavaScript code execution. ObjectMapper.readTree() only
+             * parses JSON structure and never executes code. */
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.readTree(jsonString);
+            mav.addObject("msg", msg.getMessage("msg.valid.json", null, locale));
         } catch (Exception e) {
-        	log.error("Exception occurs: ", e);
-        	mav.addObject("errmsg", msg.getMessage("msg.invalid.json",
-        			new String[] { e.getMessage() }, null, locale));
+            mav.addObject("errmsg", msg.getMessage("msg.invalid.json",
+                    new String[] { e.getMessage() }, null, locale));
         }
     }
 }
